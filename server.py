@@ -1,6 +1,6 @@
 import socketserver
 import image_classifier
-from urllib.request import urlopen
+import argparse
 from base64 import b64decode
 from io import BytesIO
 from PIL import Image, ImageFile
@@ -40,13 +40,16 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
         self.wfile.write(result.encode())
         
 if __name__ == "__main__":
-    HOST, PORT = "192.122.236.104", 12345
+    parser = argparse.ArgumentParser()
+    parser.add_argument("host")
+    parser.add_argument("port")
+    args = parser.parse_args()
     
     print("start server")
     classifier_model = image_classifier.Classifier()
     print("start image classification model")
     # Create the server, binding to localhost on port 12345
-    with MyServer((HOST, PORT), MyTCPHandler, classifier_model) as server:
+    with MyServer((args.host, int(args.port)), MyTCPHandler, classifier_model) as server:
         # Activate the server; this will keep running until you
         # interrupt the program with Ctrl-C
         print("start listening")

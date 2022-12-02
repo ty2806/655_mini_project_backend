@@ -29,8 +29,9 @@ class Classifier():
             categories = [s.strip() for s in f.readlines()]
 
         top5_prob, top5_catid = torch.topk(probabilities, 5)
+        top5 = []
         for i in range(top5_prob.size(0)):
-            top5 = categories[top5_catid[i]], top5_prob[i].item()
+            top5.append([categories[top5_catid[i]], top5_prob[i].item()])
         
         print(top5)
         return top5[0][0]

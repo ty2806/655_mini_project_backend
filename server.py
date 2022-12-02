@@ -1,10 +1,14 @@
 import socketserver
 import image_classifier
-import urllib
+from urllib.request import urlopen
+from base64 import b64decode
+from io import BytesIO
+from PIL import Image, ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 class MyServer(socketserver.TCPServer):
     def __init__(self, server_address, RequestHandlerClass, image_classifier, bind_and_activate=True):
-        super.__init__(server_address, RequestHandlerClass, bind_and_activate=True)
+        super().__init__(server_address, RequestHandlerClass, bind_and_activate=True)
         self.classifier = image_classifier
 
 
@@ -21,23 +25,29 @@ class MyTCPHandler(socketserver.StreamRequestHandler):
         # self.rfile is a file-like object created by the handler;
         self.data = self.rfile.readline().strip()
         print("{} wrote:".format(self.client_address[0]))
-        print(self.data)
-
-        response = urllib.request.urlopen(self.data)
-        with open('image.jpg', 'wb') as f:
-            f.write(response.file.read())
+        data_uri = self.data.decode()
+        print(data_uri)
+        
+        data_uri += "=="
+        image = Image.open(BytesIO(b64decode(data_uri.split(',')[1])))
+        image = image.convert('RGB')
+        image.save("image.jpg")
 
         model = self.server.classifier
         result = model.classify('image.jpg')
-
-        self.wfile.write(result)
-
+        print("get result: " + result)
+        
+        self.wfile.write(result.encode())
+        
 if __name__ == "__main__":
-    HOST, PORT = "localhost", 12345
-
+    HOST, PORT = "192.122.236.104", 12345
+    
+    print("start server")
     classifier_model = image_classifier.Classifier()
+    print("start image classification model")
     # Create the server, binding to localhost on port 12345
-    with socketserver.TCPServer((HOST, PORT), MyTCPHandler, classifier_model) as server:
+    with MyServer((HOST, PORT), MyTCPHandler, classifier_model) as server:
         # Activate the server; this will keep running until you
         # interrupt the program with Ctrl-C
+        print("start listening")
         server.serve_forever()

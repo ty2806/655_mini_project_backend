@@ -1,6 +1,10 @@
 ### backend server setup instruction
-1. Set up a geni node using rspec https://github.com/ty2806/655_mini_project_backend/blob/main/rspec.txt
-2. Login to the geni node
+1. Set up 3 geni slices using rspec 
+    https://github.com/ty2806/655_mini_project_backend/blob/main/back1.rspec.txt
+    https://github.com/ty2806/655_mini_project_backend/blob/main/back2.rspec.txt
+    https://github.com/ty2806/655_mini_project_backend/blob/main/back3.rspec.txt
+
+2. Login to each the geni node
 3. Copy this bash script https://github.com/ty2806/655_mini_project_backend/blob/main/setup.sh to the geni node and execute it.
    You may need to restart the terminal to activate conda environment.
 4. cd ./655_mini_project_backend
